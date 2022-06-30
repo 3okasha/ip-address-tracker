@@ -1,0 +1,13 @@
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+.hero-bg-image {
+  background: url("../../public/images/pattern-bg.png") no-repeat;
+  background-size: cover;
+}
+.vertical-offset {
+  top: 120px;
+}
+@media (min-width: 575px) {
+  .vertical-offset {
+    top: 55px;
+  }
+}
