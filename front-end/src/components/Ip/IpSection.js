@@ -3,8 +3,9 @@ import axios from "axios";
 const geoAPIKey = "at_OL5AP2QeUTdWsdO9rqHUKW91v8NLc";
 const ipifiAPI = `https://geo.ipify.org/api/v2/country?apiKey=${geoAPIKey}&ipAddress=`;
 
-const IpSection = () => {
+const IpSection = (props) => {
   const [ipVal, setIpVal] = useState("8.8.8.8");
+  const [error, setError] = useState("");
   const [geoData, setGeoData] = useState({
     ip: "8.8.8.8",
     location: "Califronia, US",
@@ -15,18 +16,34 @@ const IpSection = () => {
   const handleInputChange = (e) => {
     setIpVal(e.target.value);
   };
+
+  const validateIp = (ipVal) => {
+    let err = "";
+    const ipRegex =
+      /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    if (!ipRegex.test(ipVal)) {
+      err = "Enter a valid IP Address";
+    }
+    setError(err);
+    return err;
+  };
+
   const handleFindIpClick = () => {
-    axios.get(ipifiAPI + ipVal).then((recievedGeoData) =>
-      setGeoData({
-        ip: recievedGeoData.data["ip"],
-        location:
-          recievedGeoData.data["location"]["region"] +
-          ", " +
-          recievedGeoData.data["location"]["country"],
-        timeZone: recievedGeoData.data["location"]["timezone"],
-        isp: recievedGeoData.data["isp"],
-      })
-    );
+    const error = validateIp(ipVal);
+    if (!error) {
+      axios.get(ipifiAPI + ipVal).then((recievedGeoData) =>
+        setGeoData({
+          ip: recievedGeoData.data["ip"],
+          location:
+            recievedGeoData.data["location"]["region"] +
+            ", " +
+            recievedGeoData.data["location"]["country"],
+          timeZone: recievedGeoData.data["location"]["timezone"],
+          isp: recievedGeoData.data["isp"],
+        })
+      );
+      props.findCoordinates(geoData["location"]);
+    }
   };
   return (
     <section className="container-fluid bg-image hero-bg-image">
@@ -52,6 +69,14 @@ const IpSection = () => {
               {">"}
             </span>
           </div>
+          {error && (
+            <div
+              data-testid="errorMsg"
+              className="text-danger border rounded mt-1 p-2 bg-white fs-5 width-fit-content"
+            >
+              {error}
+            </div>
+          )}
         </div>
       </div>
       <div className="row justify-content-center position-relative vertical-offset">
