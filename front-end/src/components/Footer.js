@@ -1,7 +1,7 @@
 import React from "react";
-import(
-  "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css"
-);
+// import(
+//   "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css"
+// );
 const Footer = () => {
   return (
     <>
