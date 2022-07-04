@@ -11,3 +11,12 @@
     top: 55px;
   }
 }
+
+.leaflet-container {
+  min-height: 70vh;
+  z-index: -1;
+}
+
+.width-fit-content {
+  width: fit-content;
+}
