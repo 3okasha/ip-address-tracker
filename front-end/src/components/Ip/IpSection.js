@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 const geoAPIKey = "at_OL5AP2QeUTdWsdO9rqHUKW91v8NLc";
 const ipifiAPI = `https://geo.ipify.org/api/v2/country?apiKey=${geoAPIKey}&ipAddress=`;
@@ -7,12 +7,26 @@ const IpSection = (props) => {
   const [ipVal, setIpVal] = useState("8.8.8.8");
   const [error, setError] = useState("");
   const [geoData, setGeoData] = useState({
-    ip: "8.8.8.8",
-    location: "Califronia, US",
-    timeZone: "UTC-07",
-    isp: "Google LLC",
+    ip: "",
+    location: "",
+    timeZone: "",
+    isp: "",
   });
 
+  useEffect(() => {
+    //fetch default ip data
+    axios.get(ipifiAPI + ipVal).then((recievedGeoData) =>
+      setGeoData({
+        ip: recievedGeoData.data["ip"],
+        location:
+          recievedGeoData.data["location"]["region"] +
+          ", " +
+          recievedGeoData.data["location"]["country"],
+        timeZone: recievedGeoData.data["location"]["timezone"],
+        isp: recievedGeoData.data["isp"],
+      })
+    );
+  }, []);
   const handleInputChange = (e) => {
     setIpVal(e.target.value);
   };
@@ -31,7 +45,7 @@ const IpSection = (props) => {
   const handleFindIpClick = () => {
     const error = validateIp(ipVal);
     if (!error) {
-      axios.get(ipifiAPI + ipVal).then((recievedGeoData) =>
+      axios.get(ipifiAPI + ipVal).then((recievedGeoData) => {
         setGeoData({
           ip: recievedGeoData.data["ip"],
           location:
@@ -40,9 +54,14 @@ const IpSection = (props) => {
             recievedGeoData.data["location"]["country"],
           timeZone: recievedGeoData.data["location"]["timezone"],
           isp: recievedGeoData.data["isp"],
-        })
-      );
-      props.findCoordinates(geoData["location"]);
+        });
+
+        props.findCoordinates(
+          recievedGeoData.data["location"]["region"] +
+            ", " +
+            recievedGeoData.data["location"]["country"]
+        );
+      });
     }
   };
   return (
@@ -86,25 +105,34 @@ const IpSection = (props) => {
               <p className="mb-0 text-muted text-uppercase fw-light">
                 IP Address
               </p>
-              <p className="data-value fs-4">{geoData["ip"]}</p>
+              <p data-testid="ip" className="data-value fs-4">
+                {geoData["ip"]}
+              </p>
+              {/* <input data-testid="ip" value={geoData["ip"]} className="data-value fs-4"/> */}
             </div>
             <div className="col-12 col-sm-3 p-sm-2 border-end">
               <p className="mb-0 text-muted text-uppercase fw-light">
                 Location
               </p>
-              <p className="data-value fs-4">{geoData["location"]}</p>
+              <p data-testid="location" className="data-value fs-4">
+                {geoData["location"]}
+              </p>
             </div>
 
             <div className="col-12 col-sm-3 p-sm-2 border-end">
               <p className="mb-0 text-muted text-uppercase fw-light">
                 Timezone
               </p>
-              <p className="data-value fs-4">UTC{geoData["timeZone"]}</p>
+              <p data-testid="timeZone" className="data-value fs-4">
+                UTC{geoData["timeZone"]}
+              </p>
             </div>
 
             <div className="col-12 col-sm-3 p-sm-2">
               <p className="mb-0 text-muted text-uppercase fw-light">ISP</p>
-              <p className="data-value fs-4">{geoData["isp"]}</p>
+              <p data-testid="isp" className="data-value fs-4">
+                {geoData["isp"]}
+              </p>
             </div>
           </div>
         </div>
